@@ -4,7 +4,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from jokes.generate import try_to_generate_joke
-from keyboards.length import make_row_keyboard
+from utils.length_keyboard import make_row_keyboard
 
 router = Router()
 
