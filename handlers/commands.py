@@ -1,19 +1,11 @@
 from aiogram import Router, F
 from aiogram.filters import Command, StateFilter
-from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
-from jokes.ai import get_joke, get_words_joke
-from keyboards.length import make_row_keyboard
+from aiogram.fsm.state import default_state
+from aiogram.types import Message, ReplyKeyboardRemove
+from jokes.ai import get_joke
 
 router = Router()
-
-joke_length = ['Короткий', 'Средний', 'Длинный']
-
-
-class JokeWithWords(StatesGroup):
-    choosing_words = State()
-    choosing_length = State()
 
 
 @router.message(Command("start"))
@@ -28,31 +20,24 @@ async def cmd_start(message: Message):
 
 @router.message(Command("joke"))
 async def cmd_generate_joke(message: Message):
+    await message.answer(get_joke())
+
+
+@router.message(StateFilter(None), Command(commands=["cancel"]))
+@router.message(default_state, F.text.lower() == "отмена")
+async def cmd_cancel_no_state(message: Message, state: FSMContext):
+    await state.set_data({})
     await message.answer(
-        get_joke()
+        text="Нечего отменять",
+        reply_markup=ReplyKeyboardRemove()
     )
 
 
-@router.message(StateFilter(None), Command("wordsjoke"))
-async def cmd_words_joke(message: Message, state: FSMContext):
+@router.message(Command(commands=["cancel"]))
+@router.message(F.text.lower() == "отмена")
+async def cmd_cancel(message: Message, state: FSMContext):
+    await state.clear()
     await message.answer(
-        "Введите через пробел слова, которые должны присутствовать в анекдоте"
-    )
-    await state.set_state(JokeWithWords.choosing_words)
-
-
-@router.message(JokeWithWords.choosing_words, F.text.len() > 0)
-async def choose_words_for_joke(message: Message, state: FSMContext):
-    await state.update_data(words=message.text.lower())
-    await message.answer(
-        text="Интересный выбор. Теперь выбери длину анекдота",
-        reply_markup=make_row_keyboard(joke_length)
-    )
-    await state.set_state(JokeWithWords.choosing_length)
-
-
-@router.message(JokeWithWords.choosing_words)
-async def incorrect_words(message: Message):
-    await message.answer(
-        text="Я тебя не понял. Попробуй ввести слова заново"
+        text="Действие отменено",
+        reply_markup=ReplyKeyboardRemove()
     )

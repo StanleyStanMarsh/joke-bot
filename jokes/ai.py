@@ -12,7 +12,7 @@ def get_joke() -> str:
     return response.choices[0].message.content
 
 
-def get_words_joke(words: set) -> str:
+def get_words_joke(words: set, length: str) -> str:
     required_words = ', '.join(words)
-    response = giga.chat(f'Напиши анекдот про Штирлица. Обязательно используй все эти слова: {required_words}')
+    response = giga.chat(f'Напиши {length} анекдот про Штирлица. Обязательно используй все эти слова: {required_words}')
     return response.choices[0].message.content
