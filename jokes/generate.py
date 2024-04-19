@@ -1,4 +1,4 @@
-from jokes.ai import get_words_joke
+from jokes.ai import get_words_joke, words_check
 
 
 def delete_punctuation(s: str) -> str:
@@ -17,14 +17,7 @@ def try_to_generate_joke(words: str, length: str) -> str:
     for i in range(5):
         joke = get_words_joke(words_set, length)
         joke_set = set(map(str.lower, delete_punctuation(joke).split()))
-        required_words = set(words_set)
-
-        for word in joke_set:
-            for req in required_words:
-                if word.startswith(req):
-                    required_words.discard(req)
-                    break
-
-        if len(required_words) == 0:
+        response = words_check(words, joke).lower()
+        if 'да' in response or 'yes' in response:
             return joke
     return "Не удалось сгенерировать анекдот"
