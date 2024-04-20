@@ -1,0 +1,3 @@
+aiogram==3.4.1
+gigachain==0.1.16
+python-dotenv==1.0.1
